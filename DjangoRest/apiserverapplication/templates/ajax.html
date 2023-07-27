@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax</title>
+</head>
+<body>
+<div id = 'display place'></div>
+<button id = "alldata">모든 데이터 가져오기</button>
+
+bookid<input type="text" id = 'bookid'/>
+<button id = "getbookid">데이터 1개 가져오기</button>
+</body>
+<script>
+    // 데이터가 1개인 경우의 이벤트 처리
+    document.getElementById("getbookid").addEventListener('click',
+    (e) => {
+        // id 가 bookid 인 입력의 값을 가져오기
+        let bookid = document.getElementById('bookid').value;
+        //alert(bookid)
+
+        let request = new XMLHttpRequest();
+        // url 에 bookid 를 추가해서 사용
+        request.open('GET', '../example/book/' + bookid, true);
+        request.send('')
+        request.addEventListener("load", (e) => {
+        // bookid 와 일치하는 번호가 없는 경우에는 detail에 404 Not found 에러가 발생
+        //alert(request.responseText)
+
+        // 데이터를 파싱해서 문자열을 오브젝트로 만듦
+        let data = JSON.parse(request.responseText);
+        let booktext = ''
+        // 데이터가 없는 경우 undefined 가 아니라 의도한 결과를 출력하도록 만들기
+        // in 은 속성을 가지고 있는지 판단
+        // 데이터가 없으면 True(detail 속성을 가지고 있음), 있으면 False 를 반환함
+        if('detail' in data){
+            booktext = '<h2> 잘못된 book id 입니다</h2>'
+            }
+        else{
+        booktext += '<p>' + data.bookid + '</p>';
+        booktext += '<p>' + data.title + '</p>';
+        booktext += '<p>' + data.pub_date + '</p>';
+        }
+
+        // alert(request.responseText);
+        document.getElementById('display place').innerHTML = booktext;
+        })
+
+        })
+
+    // 모든 데이터를 가져오는 경우의 이벤트 처리
+    document.getElementById("alldata").addEventListener("click",
+    (e) => {
+    let request = new XMLHttpRequest();
+    // 출력하는 함수에 객체를 대입하면 toString 메서드를 호출함
+        // 파이썬은 __str__ 메서드를 호출함
+        // __str__ 를 재정의하면 그 내용이 출력되지만
+        // 재정의 하지 않으면 기본적으로 설정된 출력을 함(여기서는 XMLHttpRequest 오브젝트)
+    //alert(request)
+
+    // 요청을 생성
+    // http://127.0.0.1:8000/example/books/ : 요청할 url
+    // 현재 위치는 http://127.0.0.1:8000/ajax/
+    // 현재 위치 바로 뒤에 example/books/ 를 붙이면 존재하지 않는 url 이므로
+	// .. 을 사용해서 디렉토리를 변경해줘야 함
+    // open(전송방식, url, 비동기여부)
+    request.open('GET', '../example/books/', true);
+
+    // 요청을 전송
+    // 파라미터가 없으면 '' 사용
+    request.send('')
+
+    // 응답이 오면 호출
+    // xml 데이터가 아니므로 responseText 사용
+    request.addEventListener("load", (e) => {
+    // 데이터를 문자열로 가져옴
+    //alert(request.responseText)
+
+    // 문자열을 자바스크립트 데이터(오브젝트)로 변환
+    // 문자열을 데이터로 변환하는게 parsing(파싱)
+    // 변환된 데이터는 객체들의 배열
+    let data = JSON.parse(request.responseText);
+    // 자바스크립트에서 for 문에 in 을 사용하면 index를 가져오므로
+    // 데이터를 가져오기 위해서 of 를 사용
+    let booktext = ''
+    for(let item of data){
+        booktext += '<p>' + item.bookid + '</p>';
+        booktext += '<p>' + item.title + '</p>';
+        booktext += '<p>' + item.pub_date + '</p>';
+        }
+    document.getElementById('display place').innerHTML = booktext;
+
+    })
+    })
+</script>
+</html>
